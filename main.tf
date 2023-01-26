@@ -1,33 +1,43 @@
-pipeline{
-    
-    agent any 
-    
-    stages{
-        
-        stage('git checkout'){
-            steps{
-               git branch: 'main', url: 'https://github.com/sunillangan/terraform_jenkin_module.git'
-            }
-        }
-        stage('terraform init'){
-            steps{
-                sh 'terraform init'
-            }
-        }
-         stage('terraform plan'){
-            steps{
-                sh 'terraform plan'
-            }
-        }
-         stage('terraform apply'){
-            steps{
-                 sh 'terraform apply --auto-approve'
-            }
-        }
-        stage('terraform destroy'){
-            steps{
-              sh 'terraform destroy --auto-approve'
-            }
-        }
-    }
+provider "aws" {
+  region  = "us-east-1"
 }
+
+
+resource "aws_security_group" "allow_tls" {
+  name = "sunil-security_group"
+  description = "Allow TLS inbound traffic"
+
+  ingress {
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
+    cidr_blocks      = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    cidr_blocks      = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port = 8080
+    to_port = 8080
+    protocol = "tcp"
+   cidr_blocks      = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+  tags = {
+    Name = "allow_tls"
+  }
+}
+
